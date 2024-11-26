@@ -224,9 +224,7 @@
                         <thead>
                             <tr>
                                 <th colspan="15">
-                                    <div id="result1">
-
-                                    </div>
+                                    <div id="result1"></div>
                                 </th>
                             </tr>
                             <tr>
@@ -348,14 +346,21 @@ function prepareForPrint(data) {
         yearlevel = "ประกาศนียบัตรวิชาชีพชั้นสูง (ปวส. ม.6)";
     }
 
+    const shortYear = year ? year.slice(-2) : "ทั้งหมด";
+
+    const semesterInfo1 = document.getElementById('semester-info1');
+    const semesterInfo2 = document.getElementById('semester-info2');
+    semesterInfo1.innerHTML = `ภาคเรียนที่ 1 ปีการศึกษา ${year || "ทั้งหมด"}`;
+    semesterInfo2.innerHTML = `ภาคเรียนที่ 2 ปีการศึกษา ${year || "ทั้งหมด"}`;
+
     // แสดงข้อมูลที่เลือก
     const resultContainer = document.getElementById('result1');
     resultContainer.innerHTML = `
-        <p>
-            แผนการเรียน ${yearlevel || "ทั้งหมด"}
+        <p style="margin: 0; padding: 0; justify-content: center; align-items: center;">
+            แผนการเรียน${yearlevel || "ทั้งหมด"}
             ${gradeLevel || "ทั้งหมด"}
-            ปีการศึกษา ${year || "ทั้งหมด"}
-            กลุ่ม ${group || "ทั้งหมด"}
+            รหัส ${shortYear || "ทั้งหมด"}
+            ก. ${group || "ทั้งหมด"}
         </p>
     `;
 }
