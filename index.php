@@ -283,12 +283,21 @@
             
 
                 <script>
+let selectedCheckboxes = new Set(); // เก็บค่าของ checkbox ที่เลือก
+
+
 function filterData() {
     const level = $('#yearSelect').val() || "ทั้งหมด"; // ชั้นปี
     const term = $('#semesterSelect').val() || "ทั้งหมด"; // ภาคเรียน
     const year = $('#year').val() || "ทั้งหมด"; // ปีการศึกษา
     const category = $('#category').val() || "ทั้งหมด"; // หมวด
     const group = $('#groupSelect').val() || "ทั้งหมด"; // กลุ่ม
+
+    const checkboxes = document.querySelectorAll('.data-checkbox:checked');
+    checkboxes.forEach(cb => {
+        const id = cb.getAttribute('data-id');
+        selectedCheckboxes.add(id); // เก็บค่าของ checkbox ที่เลือก
+    });
 
     // กำหนดชั้นปีจากภาคเรียน
     let gradeLevel = "";
@@ -326,6 +335,11 @@ function filterData() {
         },
         success: function(data) {
             $('#filteredData').html(data); // แสดงผลในตาราง
+
+            selectedCheckboxes.forEach(id => {
+                const checkbox = document.querySelector(`.data-checkbox[data-id="${id}"]`);
+                if (checkbox) checkbox.checked = true;
+            });
         },
         error: function() {
             $('#filteredData').html('<p>ไม่สามารถดึงข้อมูลได้</p>');
@@ -441,6 +455,7 @@ function printPage() {
     const subjectIds = [];
     const terms = [];
 
+    // เก็บค่าจาก checkbox ที่เลือกไว้
     checkboxes.forEach(cb => {
         subjectIds.push(cb.getAttribute('data-id'));
         terms.push(cb.getAttribute('data-term'));
@@ -451,7 +466,7 @@ function printPage() {
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ subjectIds, terms }),
+        body: JSON.stringify({ subjectIds, terms }), // ส่งข้อมูล checkbox ที่เลือก
     })
         .then(response => response.json())
         .then(data => {
@@ -466,8 +481,6 @@ function printPage() {
             alert('เกิดข้อผิดพลาดในการโหลดข้อมูล กรุณาลองใหม่อีกครั้ง');
         });
 }
-
-
 
 
                 </script>
