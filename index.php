@@ -353,7 +353,7 @@ function prepareForPrint(data) {
     resultContainer.innerHTML = `
         <p>
             แผนการเรียน ${yearlevel || "ทั้งหมด"}
-            ระดับชั้น ${gradeLevel || "ทั้งหมด"}
+            ${gradeLevel || "ทั้งหมด"}
             ปีการศึกษา ${year || "ทั้งหมด"}
             กลุ่ม ${group || "ทั้งหมด"}
         </p>
