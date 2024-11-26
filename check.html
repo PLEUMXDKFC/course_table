@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        /* Video Explanatio - https://youtu.be/y1ATUFJyLaI */
+body {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* https://upload.wikimedia.org/wikipedia/commons/thumb/2/27/White_check.svg/1200px-White_check.svg.png 
+*/
+
+.check-box-group {
+  display: flex;
+  flex-direction: column;
+  
+}
+
+.custom-checkbox {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  margin: 10px 0;
+}
+
+.custom-checkbox .label {
+  font-size: 1.2em;
+  margin: 0 10px;
+}
+
+.custom-checkbox .checkmark {
+  width: 35px;
+  height: 35px;
+  border: 2px solid #222;
+  display: inline-block;
+  border-radius: 3px;
+  background: #222 url(https://upload.wikimedia.org/wikipedia/commons/thumb/2/27/White_check.svg/1200px-White_check.svg.png) center/1250% no-repeat;
+  transition: background-size 0.2s ease;
+}
+
+.custom-checkbox input:checked + .checkmark {
+  background-size: 60%;
+  transition: background-size 0.25s cubic-bezier(0.7, 0, 0.18, 1.24);
+}
+
+.custom-checkbox input {
+  display: none;
+}
+    </style>
+</head>
+<body>
+    <div class="check-box-group">
+        <label class="custom-checkbox" tab-index="0" aria-label="Checkbox Label">
+          <input type="checkbox" checked>
+          <span class="checkmark"></span>
+          <span class="label">Checkbox Label</span>
+        </label>
+      
+        <label class="custom-checkbox" tab-index="0" aria-label="Another Label">
+          <input type="checkbox">
+          <span class="checkmark"></span>
+          <span class="label">Another Label</span>
+        </label>
+      </div>
+      
+      <a href="https://youtu.be/y1ATUFJyLaI" style="position: fixed; bottom: 25px; left: 25px; color: #222; text-shadow: 0 0 1px #222;" target="_blank">Watch Video Explanation</a>
+      </div>
+</body>
+</html>

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Course Management Interface</title>
+<link rel="stylesheet" href="styles.css"> <!-- Link to your CSS file -->
+</head>
+<body>
+
+<div class="container">
+    <!-- Top Navigation -->
+    <div class="top-nav">
+        <a href="#">หน้าหลัก</a>
+        <a href="#">ระบบงานหลักสูตร</a>
+        <a href="#">แผนการเรียน</a>
+    </div>
+
+    <!-- Control Buttons -->
+    <div class="controls">
+        <button>ย้อนกลับ</button>
+        <button>เพิ่มแผน</button>
+        <button>คัดลอกแผน</button>
+        <button>พิมพ์แผน 1 ภาคเรียน</button>
+        <button>พิมพ์แผน 2 ภาคเรียน</button>
+        <button>พิมพ์โครงสร้างหลักสูตร</button>
+        <button>พิมพ์ข้อมูลแผนการเรียน</button>
+        <button>พิมพ์ประวัติการแก้ไขแผนการเรียน</button>
+        <button>ประวัติการแก้ไขแผนการเรียน</button>
+        <button>กำหนดลักษณะงาน</button>
+    </div>
+
+    <!-- Course Information Section -->
+    <div class="course-info">
+        <label>ภาคเรียน:</label>
+        <select>
+            <option>-- ทั้งหมด --</option>
+        </select>
+        
+        <p>กลุ่มเรียน: <span>622010105 : ชย.ทช3/1</span></p>
+        <p>หลักสูตร: <span>(ปวช.62) ยานยนต์</span></p>
+        <p>ปีที่สมัครเรียน: <span>1/2562</span></p>
+        <p>แผนกวิชา: <span>ช่างยนต์</span></p>
+        
+        <div class="nqf">
+            <p>มาตรฐาน NQF: <input type="checkbox"></p>
+            <p>ระยะเวลารวมตลอดหลักสูตร: <span class="highlight">3 ปีการศึกษา</span></p>
+            <p>หน่วยกิจกิจกรรมตลอดหลักสูตร: <span class="highlight">103 หน่วยกิต</span></p>
+            <p>หน่วยกิจรวมตามแผนการเรียน: <span class="highlight">105 หน่วยกิต ( ครบตามหลักสูตร )</span></p>
+            <p>หัวหน้าแผนก: <span>นายเอกภาพ ศรีรมย์</span></p>
+        </div>
+
+        <button class="delete-plan">ลบรายการวิชา</button>
+    </div>
+
+    <!-- Search and Table Section -->
+    <div class="search-bar">
+        <label for="search">ค้นหา:</label>
+        <input type="text" id="search" placeholder="ค้นหาวิชา">
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>ภาคเรียนที่</th>
+                <th>หมวด</th>
+                <th>ชื่อวิชา</th>
+                <th>หน่วยกิต</th>
+                <th>กลุ่มแผน</th>
+                <th>(4)</th>
+                <th>(5)</th>
+                <th>วันที่บันทึก</th>
+                <th>การจัดการ</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>1</td>
+                <td>1/2562</td>
+                <td>1.1 กลุ่มวิชาภาษาไทย</td>
+                <td>ภาษาไทยพื้นฐาน</td>
+                <td>2-0-2</td>
+                <td>-</td>
+                <td>-</td>
+                <td>-</td>
+                <td>04 มิ.ย. 2562</td>
+                <td>
+                    <button>แก้ไข</button>
+                    <button>ลบข้อมูล</button>
+                </td>
+            </tr>
+            <!-- Additional rows here as needed -->
+        </tbody>
+    </table>
+</div>
+
+</body>
+</html>
