@@ -213,7 +213,7 @@ $group = isset($_POST['group']) && !empty($_POST['group']) ? $_POST['group'] : $
                 
                 <button type="submit" name="submit" class="btn-primary">บันทึก</button>
 
-                <a href="index.php" class="btn-secondary">ยกเลิก</a>
+                <a href="index2.php" class="btn-secondary">ยกเลิก</a>
             </div>
 
             <!-- หมายเหตุ -->
