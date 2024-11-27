@@ -15,26 +15,30 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $category = $_POST['category'] ?? '';
     $plan_group = $_POST['plan_group'] ?? '';
     $group = $_POST['group'] ?? '';  // Corrected group parameter
+    $teacher_id = $_POST['teacher_id'] ?? ''; // รับ teacher_id จากฟอร์ม
+    $teacher_name = $_POST['teacher_name'] ?? ''; // รับ teacher_name จากฟอร์ม (ถ้าจำเป็น)
 
     // ตรวจสอบฟิลด์ที่จำเป็นต้องกรอก
-    if ($term && $year && $level && $subject_code && $subject_name && $category) {
+    if ($term && $year && $level && $subject_code && $subject_name && $category && $teacher_id) {
         // เตรียมคำสั่ง SQL
-        $stmt = $conn->prepare("INSERT INTO tb_plan (term, year, level, subject_code, subject_name, type, theory, practice, credits, category, plan_group, `group`) 
-                               VALUES (:term, :year, :level, :subject_code, :subject_name, :type, :theory, :practice, :credits, :category, :plan_group, :group)");
+        $stmt = $conn->prepare("INSERT INTO tb_plan (term, year, level, subject_code, subject_name, type, theory, practice, credits, category, plan_group, `group`, teacher_id) 
+                       VALUES (:term, :year, :level, :subject_code, :subject_name, :type, :theory, :practice, :credits, :category, :plan_group, :group, :teacher_id)");
 
-        // ผูกค่ากับพารามิเตอร์
-        $stmt->bindParam(':term', $term);
-        $stmt->bindParam(':year', $year);
-        $stmt->bindParam(':level', $level);
-        $stmt->bindParam(':subject_code', $subject_code);
-        $stmt->bindParam(':subject_name', $subject_name);
-        $stmt->bindParam(':type', $type);
-        $stmt->bindParam(':theory', $theory, PDO::PARAM_INT);
-        $stmt->bindParam(':practice', $practice, PDO::PARAM_INT);
-        $stmt->bindParam(':credits', $credits, PDO::PARAM_INT);
-        $stmt->bindParam(':category', $category);
-        $stmt->bindParam(':plan_group', $plan_group);
-        $stmt->bindParam(':group', $group);  // Corrected group parameter
+// ผูกค่ากับพารามิเตอร์ (ลบ `teacher_name`)
+$stmt->bindParam(':term', $term);
+$stmt->bindParam(':year', $year);
+$stmt->bindParam(':level', $level);
+$stmt->bindParam(':subject_code', $subject_code);
+$stmt->bindParam(':subject_name', $subject_name);
+$stmt->bindParam(':type', $type);
+$stmt->bindParam(':theory', $theory, PDO::PARAM_INT);
+$stmt->bindParam(':practice', $practice, PDO::PARAM_INT);
+$stmt->bindParam(':credits', $credits, PDO::PARAM_INT);
+$stmt->bindParam(':category', $category);
+$stmt->bindParam(':plan_group', $plan_group);
+$stmt->bindParam(':group', $group);
+$stmt->bindParam(':teacher_id', $teacher_id);
+
 
         // ดำเนินการบันทึกข้อมูล
         if ($stmt->execute()) {
@@ -166,6 +170,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <option value="กลุ่มวิชาสำหรับผู้จบ ปวช.ต่างประเภทวิชา">กลุ่มวิชาสำหรับผู้จบ ปวช.ต่างประเภทวิชา</option>
                 </select>
                 
+            </div>
+            <div class="form-group">
+            <label for="teacher_id">ครูผู้สอน:</label>
+<select id="teacher_id" name="teacher_id" required>
+    <option value="">เลือกครู</option>
+    <?php
+    $stmt = $conn->prepare("SELECT teacher_id, teacher_name FROM teacherinfo");
+    $stmt->execute();
+    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        echo "<option value='{$row['teacher_id']}'>{$row['teacher_name']}</option>";
+    }
+    ?>
+</select>
+
+
+
             </div>
 
             <!-- ปุ่มบันทึก/ยกเลิก -->
