@@ -284,8 +284,7 @@
 
                 <script>
 let checkboxStates = {}; // เก็บสถานะ checkbox แยกตาม filter
-let selectedCheckboxes = new Set(); // เก็บค่า checkbox ที่ถูกเลือก444444444444444444444444444444444
-
+let selectedCheckboxes = new Set(); // เก็บค่า checkbox ที่ถูกเลือก
 
 function filterData() {
     const level = $('#yearSelect').val() || "ทั้งหมด"; // ชั้นปี
