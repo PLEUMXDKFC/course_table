@@ -283,8 +283,8 @@
             
 
                 <script>
-let selectedCheckboxes = new Set(); // เก็บค่าของ checkbox ที่เลือก
-
+let checkboxStates = {}; // เก็บสถานะ checkbox แยกตาม filter
+let selectedCheckboxes = new Set(); // เก็บค่า checkbox ที่ถูกเลือก
 
 function filterData() {
     const level = $('#yearSelect').val() || "ทั้งหมด"; // ชั้นปี
@@ -292,11 +292,15 @@ function filterData() {
     const year = $('#year').val() || "ทั้งหมด"; // ปีการศึกษา
     const category = $('#category').val() || "ทั้งหมด"; // หมวด
     const group = $('#groupSelect').val() || "ทั้งหมด"; // กลุ่ม
+    const filterKey = `${level}_${term}_${year}`; // สร้าง key สำหรับ filter ปัจจุบัน
 
-    const checkboxes = document.querySelectorAll('.data-checkbox:checked');
-    checkboxes.forEach(cb => {
+    // บันทึกสถานะ checkbox ปัจจุบันลงใน checkboxStates
+    document.querySelectorAll('.data-checkbox').forEach(cb => {
         const id = cb.getAttribute('data-id');
-        selectedCheckboxes.add(id); // เก็บค่าของ checkbox ที่เลือก
+        if (!checkboxStates[filterKey]) {
+            checkboxStates[filterKey] = {};
+        }
+        checkboxStates[filterKey][id] = cb.checked; // บันทึกสถานะ checkbox
     });
 
     // กำหนดชั้นปีจากภาคเรียน
@@ -312,46 +316,91 @@ function filterData() {
     // อัปเดตแสดงชั้นปีในหน้าเว็บ
     $('#gradeLevelDisplay').html(`ระดับชั้น: ${gradeLevel || "ทั้งหมด"}`);
 
-    // เรียก prepareForPrint โดยส่งค่าตัวแปรทั้งหมด
-    prepareForPrint({
-        level: level,
-        term: term,
-        year: year,
-        category: category,
-        group: group,
-        gradeLevel: gradeLevel,
-    });
-
-    // ส่งข้อมูลไปยัง PHP
+    // เรียกข้อมูลใหม่จาก PHP
     $.ajax({
-        url: 'filterData-add_table.php', // URL ที่จะไปดึงข้อมูล
+        url: 'filterData-add_table.php',
         type: 'GET',
-        data: {
-            level: level,
-            term: term,
-            year: year,
-            category: category,
-            group: group
-        },
+        data: { level, term, year, category, group },
         success: function(data) {
             $('#filteredData').html(data); // แสดงผลในตาราง
 
-            selectedCheckboxes.forEach(id => {
-                const checkbox = document.querySelector(`.data-checkbox[data-id="${id}"]`);
-                if (checkbox) checkbox.checked = true;
+            // เมื่อฟิลเตอร์เป็น "ทั้งหมด" ให้คืนค่าการเลือก checkbox ทุกตัว
+            document.querySelectorAll('.data-checkbox').forEach(cb => {
+                const id = cb.getAttribute('data-id');
+                // ถ้าคีย์ใน checkboxStates มีการเลือกไว้สำหรับฟิลเตอร์นี้ ให้คืนค่าตามนั้น
+                if (checkboxStates[filterKey] && checkboxStates[filterKey][id] !== undefined) {
+                    cb.checked = checkboxStates[filterKey][id];
+                } else {
+                    cb.checked = false; // ถ้าไม่มีการเลือกไว้ให้เป็น false
+                }
             });
         },
         error: function() {
             $('#filteredData').html('<p>ไม่สามารถดึงข้อมูลได้</p>');
         }
     });
+
+    // เตรียมข้อมูลสำหรับการพิมพ์
+    prepareForPrint({
+        level: level,
+        term: term,
+        year: year,
+        group: group,
+        gradeLevel: gradeLevel,
+    });
+}
+
+
+function updateTable(checkbox) {
+    const level = $('#yearSelect').val() || "ทั้งหมด";
+    const term = $('#semesterSelect').val() || "ทั้งหมด";
+    const year = $('#year').val() || "ทั้งหมด";
+    const filterKey = `${level}_${term}_${year}`; // Key ของ filter ปัจจุบัน
+
+    // อัปเดต `selectedCheckboxes` และ `checkboxStates`
+    const id = checkbox.getAttribute('data-id');
+    if (checkbox.checked) {
+        selectedCheckboxes.add(id); // เพิ่ม ID ที่เลือก
+        if (!checkboxStates[filterKey]) {
+            checkboxStates[filterKey] = {};
+        }
+        checkboxStates[filterKey][id] = true; // บันทึกสถานะใน filter ปัจจุบัน
+    } else {
+        selectedCheckboxes.delete(id); // ลบ ID ที่ไม่ได้เลือก
+        if (checkboxStates[filterKey]) {
+            checkboxStates[filterKey][id] = false; // อัปเดตสถานะใน filter ปัจจุบัน
+        }
+    }
+
+    // เตรียมข้อมูลจาก selectedCheckboxes สำหรับอัปเดตตารางที่สอง
+    const subjectIds = Array.from(selectedCheckboxes);
+
+    fetch('update_table.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ subjectIds }),
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data && data.html !== undefined) {
+                document.getElementById('table_result').innerHTML = data.html; // อัปเดตตารางที่สอง
+            } else {
+                console.error('Error: Invalid response format.');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('เกิดข้อผิดพลาดในการโหลดข้อมูล กรุณาลองใหม่อีกครั้ง');
+        });
 }
 
 function prepareForPrint(data) {
-    // ใช้ค่าที่ส่งมาจาก filterData
     const { level, term, year, group, gradeLevel } = data;
 
-    let yearlevel = "";
+    // กำหนดข้อความสำหรับ "level"
+    let yearlevel = "ทั้งหมด";
     if (level === "ปวช.") {
         yearlevel = "ประกาศนียบัตรวิชาชีพ (ปวช.)";
     } else if (level === "ปวส.") {
@@ -360,43 +409,66 @@ function prepareForPrint(data) {
         yearlevel = "ประกาศนียบัตรวิชาชีพชั้นสูง (ปวส. ม.6)";
     }
 
-    const shortYear = year ? year.slice(-2) : "ทั้งหมด";
-
+    // ดึงค่าใน DOM
     const semesterInfo1 = document.getElementById('semester-info1');
     const semesterInfo2 = document.getElementById('semester-info2');
-    semesterInfo1.innerHTML = `ภาคเรียนที่ 1 ปีการศึกษา ${year || "ทั้งหมด"}`;
-    semesterInfo2.innerHTML = `ภาคเรียนที่ 2 ปีการศึกษา ${year || "ทั้งหมด"}`;
-
-    // แสดงข้อมูลที่เลือก
     const resultContainer = document.getElementById('result1');
-    resultContainer.innerHTML = `
-        <p style="margin: 0; padding: 0; justify-content: center; align-items: center;">
-            แผนการเรียน${yearlevel || "ทั้งหมด"}
-            ${gradeLevel || "ทั้งหมด"}
-            รหัส ${shortYear || "ทั้งหมด"}
-            ก. ${group || "ทั้งหมด"}
-        </p>
-    `;
+
+    if (semesterInfo1) {
+        semesterInfo1.innerHTML = `ภาคเรียนที่ 1 ปีการศึกษา ${year || "ทั้งหมด"}`;
+    }
+    if (semesterInfo2) {
+        semesterInfo2.innerHTML = `ภาคเรียนที่ 2 ปีการศึกษา ${year || "ทั้งหมด"}`;
+    }
+    if (resultContainer) {
+        resultContainer.innerHTML = `
+            <p style="margin: 0; padding: 0; justify-content: center; align-items: center;">
+                แผนการเรียน ${yearlevel}
+                ${gradeLevel || "ทั้งหมด"}
+                รหัส ${year !== "ทั้งหมด" ? year.slice(-2) : "ทั้งหมด"}
+                กลุ่ม ${group || "ทั้งหมด"}
+            </p>
+        `;
+    }
 }
 
-// เรียกใช้ฟังก์ชัน filterData อัตโนมัติเมื่อโหลดหน้า
+function saveCheckboxStates() {
+    let checkboxStates = {};
+    document.querySelectorAll('.data-checkbox').forEach(cb => {
+        const id = cb.getAttribute('data-id');
+        checkboxStates[id] = cb.checked;
+    });
+    localStorage.setItem('checkboxStates', JSON.stringify(checkboxStates)); // เก็บสถานะลงใน localStorage
+}
+
+function loadCheckboxStates() {
+    const savedStates = localStorage.getItem('checkboxStates');
+    if (savedStates) {
+        const checkboxStates = JSON.parse(savedStates);
+        document.querySelectorAll('.data-checkbox').forEach(cb => {
+            const id = cb.getAttribute('data-id');
+            if (checkboxStates[id] !== undefined) {
+                cb.checked = checkboxStates[id]; // กำหนดสถานะตามที่บันทึกไว้
+            }
+        });
+    }
+}
+
+// เรียกใช้งานหลังจากฟังก์ชัน filterData
 $(document).ready(function() {
-    filterData();
+    filterData(); // เรียกข้อมูล
+    loadCheckboxStates(); // โหลดสถานะของ checkbox
 });
 
 
 
 function printPage() {
-    prepareForPrint(); // เรียกฟังก์ชันเตรียมข้อมูลสำหรับพิมพ์
-
-    var content = document.getElementById("print-content").innerHTML; 
-    var originalContent = document.body.innerHTML;
-
-    document.body.innerHTML = content; // แสดงเฉพาะเนื้อหาที่ต้องการ
-    window.print();
-    document.body.innerHTML = originalContent; // คืนค่าหน้าปกติหลังพิมพ์
+    var content = document.getElementById("print-content").innerHTML; // เลือกส่วนที่ต้องการพิมพ์
+    var originalContent = document.body.innerHTML;  // เก็บเนื้อหาต้นฉบับ
+    document.body.innerHTML = content;  // เปลี่ยนเนื้อหาของหน้าให้แสดงเฉพาะที่ต้องการพิมพ์
+    window.print();  // เรียกใช้หน้าต่างพิมพ์
+    document.body.innerHTML = originalContent;  // คืนค่าหน้าเดิมหลังจากพิมพ์เสร็จ
 }
-
 
 
         
@@ -449,38 +521,6 @@ function printPage() {
             options[2].style.display = 'none';  // ซ่อนตัวเลือกที่ 3 (5,6)
         }
     });
-
-    function updateTable(checkbox) {
-    const checkboxes = document.querySelectorAll('.data-checkbox:checked');
-    const subjectIds = [];
-    const terms = [];
-
-    // เก็บค่าจาก checkbox ที่เลือกไว้
-    checkboxes.forEach(cb => {
-        subjectIds.push(cb.getAttribute('data-id'));
-        terms.push(cb.getAttribute('data-term'));
-    });
-
-    fetch('update_table.php', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ subjectIds, terms }), // ส่งข้อมูล checkbox ที่เลือก
-    })
-        .then(response => response.json())
-        .then(data => {
-            if (data && data.html !== undefined) {
-                document.getElementById('table_result').innerHTML = data.html;
-            } else {
-                console.error('Error: Invalid response format.');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('เกิดข้อผิดพลาดในการโหลดข้อมูล กรุณาลองใหม่อีกครั้ง');
-        });
-}
 
 
                 </script>
