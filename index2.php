@@ -17,8 +17,11 @@
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-    <link rel="stylesheet" href="css/dash.css">
-    <link rel="stylesheet" href="css/add_table.css">
+    <link rel="stylesheet" href="dash.css">
+    <link rel="stylesheet" href="css/index2.css">
+    <link rel="stylesheet" href="css/ตารางแผนการเรียน2.css">
+    <link rel="stylesheet" href="checktest.css">
+
 </head>
 
 <body>
@@ -132,9 +135,9 @@
             </nav>
             <main class="content px-3 py-4">
 
-                <a href="add2.php" class="add" style="margin-top: 15px;"><i class="fa-solid fa-plus" style="margin-right: 5px; margin-top"></i>Add</a>
+                <a href="add2.php" class="add" style="margin-bottom: 15px;"><i class="fa-solid fa-plus" style="margin-right: 5px;"></i>Add</a>
 
-                <table>
+                <table class="table2">
                     <thead>
                         <tr>
                             <th>คำนำหน้า</th>
@@ -145,38 +148,45 @@
                             
                         </tr>
                     </thead>
-                    <tbody id="filteredData">
-                        <!-- ผลลัพธ์จะแสดงที่นี่ -->                       
+                    <tbody>
+                    <?php
+                        // เชื่อมต่อฐานข้อมูล
+                        require_once('command/conn.php');
+
+                        // SQL Query เลือกฟิลด์ที่ถูกต้อง
+                        $sql = "SELECT teacher_id, prefix, teacher_name, qualification, role FROM teacherinfo";
+                        $params = [];
+
+                        // เตรียมและรันคำสั่ง SQL
+                        $stmt = $conn->prepare($sql);
+                        $stmt->execute($params);
+                        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                        // วนลูปแสดงข้อมูลในตาราง
+                        foreach ($results as $row) {
+                            echo "<tr>
+                                    <td>{$row['prefix']}</td>
+                                    <td>{$row['teacher_name']}</td>
+                                    <td>{$row['qualification']}</td>
+                                    <td>{$row['role']}</td>
+                                    <td>
+                                        <form id='checkboxForm' style='display: flex; justify-content: center; align-items: center;'>
+                                            <a style='margin-right: 5px;' class='edit-btn' href='editข้อมูลครู.php?teacher_id={$row['teacher_id']}'>
+                                                <i class='fa-solid fa-pen-to-square' style='margin-right: 5px;'></i>
+                                            </a>
+                                            <a style='margin-right: 5px;' class='delete-btn' href='command/del.php?del2={$row['teacher_id']}'
+                                            onclick=\"return confirm('คุณแน่ใจว่าต้องการลบข้อมูลนี้หรือไม่?');\">
+                                                <i class='fa-solid fa-trash' style='margin-right: 5px;'></i>
+                                            </a>
+                                        </form>                
+                                    </td>
+                                </tr>";
+                        }
+                        ?>                  
                     </tbody>
                 </table>
                
                 <script>
-                    function filterData() {
-                        const level = $('#yearSelect').val(); // ชั้นปี
-                        const term = $('#semesterSelect').val(); // ภาคเรียน
-                        const year = $('#year').val(); // ปีการศึกษา
-
-                        $.ajax({
-                            url: 'filterData-add_table2.php', // URL ที่จะไปดึงข้อมูล
-                            type: 'GET',
-                            data: {
-                                level: level, // ส่งค่าชั้นปี
-                                term: term,   // ส่งค่าภาคเรียน
-                                year: year    // ส่งค่าปีการศึกษา
-                            },
-                            success: function(data) {
-                                $('#filteredData').html(data); // แสดงผลในตาราง
-                            },
-                            error: function() {
-                                $('#filteredData').html('<p>ไม่สามารถดึงข้อมูลได้</p>');
-                            }
-                        });
-                    }
-
-                    // เรียกใช้ฟังก์ชัน filterData อัตโนมัติเมื่อโหลดหน้า
-                    $(document).ready(function() {
-                        filterData();
-                    });
                 </script>
             </main>
             <footer class="footer">

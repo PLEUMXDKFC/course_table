@@ -39,3 +39,6 @@ ALTER TABLE `tb_plan`
 
 INSERT INTO teacherinfo (teacher_name, qualification, role)
   VALUES ('ครูตัวอย่าง', 'ปริญญาตรี', 'อาจารย์');
+
+ALTER TABLE `teahcerinfor`
+  ADD (`prefix`);

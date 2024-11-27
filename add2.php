@@ -58,7 +58,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <option value="นางสาว">นางสาว</option>
                     <option value="นาง">นาง</option>
                 </select>
-            </div>
+        </div>
 
             <!-- ชื่อครูผู้สอน -->           
             <div class="form-group">

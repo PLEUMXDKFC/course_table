@@ -67,7 +67,7 @@ document.getElementById('scrollToBottom').addEventListener('click', () => {
                     </a>
                     <ul id="profile" class="sidebar-dropdown list-unstyled collapse">
                         <li class="sidebar-item"><a href="#" class="sidebar-link">รายชื่อนักเรียน</a></li>
-                        <li class="sidebar-item"><a href="#" class="sidebar-link">รายชื่อครูผู้สอน</a></li>
+                        <li class="sidebar-item"><a href="index2.php" class="sidebar-link">รายชื่อครูผู้สอน</a></li>
                         <li class="sidebar-item"><a href="index.php" class="sidebar-link">ข้อมูลรายวิชา</a></li>
                     </ul>
                 </li>
