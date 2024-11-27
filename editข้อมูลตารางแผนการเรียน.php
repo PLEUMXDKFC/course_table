@@ -39,50 +39,58 @@ $credits = isset($_POST['credits']) && !empty($_POST['credits']) ? $_POST['credi
 $group = isset($_POST['group']) && !empty($_POST['group']) ? $_POST['group'] : $row['group'];
 
 
-    try {
-        // เตรียมคำสั่ง SQL
-        $update_query = $conn->prepare("UPDATE tb_plan SET 
-            subject_name = :subject_name,
-            subject_code = :subject_code,
-            type = :type,
-            level = :level,
-            year = :year,
-            term = :term,
-            category = :category,
-            plan_group = :plan_group,
-            theory = :theory,
-            practice = :practice,
-            credits = :credits,
-            `group` = :group
-            WHERE plan_id = :plan_id");
 
-        $update_query->execute([
-            ':plan_id' => $plan_id,
-            ':subject_name' => $subject_name,
-            ':subject_code' => $subject_code,
-            ':type' => $type,
-            ':level' => $level,
-            ':year' => $year,
-            ':term' => $term,
-            ':category' => $category,
-            ':plan_group' => $plan_group,
-            ':theory' => $theory,
-            ':practice' => $practice,
-            ':credits' => $credits,
-            ':group' => $group
-        ]);
 
-        // ตรวจสอบผลลัพธ์
-        if ($update_query->rowCount() > 0) {
-            echo "<script>alert('แก้ไขข้อมูลเรียบร้อยแล้ว');</script>";
-            echo "<script>window.location.href='index.php';</script>";
-        } else {
-            echo "<script>alert('ไม่มีการเปลี่ยนแปลงข้อมูล');</script>";
-        }
-    } catch (PDOException $e) {
-        echo "<script>alert('เกิดข้อผิดพลาด: " . $e->getMessage() . "');</script>";
+$teacher_id = isset($_POST['teacher_id']) && !empty($_POST['teacher_id']) ? $_POST['teacher_id'] : $row['teacher_id'];
+
+try {
+    // เตรียมคำสั่ง SQL
+    $update_query = $conn->prepare("UPDATE tb_plan SET 
+        subject_name = :subject_name,
+        subject_code = :subject_code,
+        type = :type,
+        level = :level,
+        year = :year,
+        term = :term,
+        category = :category,
+        plan_group = :plan_group,
+        theory = :theory,
+        practice = :practice,
+        credits = :credits,
+        `group` = :group,
+        teacher_id = :teacher_id
+        WHERE plan_id = :plan_id");
+
+    $update_query->execute([
+        ':plan_id' => $plan_id,
+        ':subject_name' => $subject_name,
+        ':subject_code' => $subject_code,
+        ':type' => $type,
+        ':level' => $level,
+        ':year' => $year,
+        ':term' => $term,
+        ':category' => $category,
+        ':plan_group' => $plan_group,
+        ':theory' => $theory,
+        ':practice' => $practice,
+        ':credits' => $credits,
+        ':group' => $group,
+        ':teacher_id' => $teacher_id
+    ]);
+
+    // ตรวจสอบผลลัพธ์
+    if ($update_query->rowCount() > 0) {
+        echo "<script>alert('แก้ไขข้อมูลเรียบร้อยแล้ว');</script>";
+        echo "<script>window.location.href='index.php';</script>";
+    } else {
+        echo "<script>alert('ไม่มีการเปลี่ยนแปลงข้อมูล');</script>";
     }
+} catch (PDOException $e) {
+    echo "<script>alert('เกิดข้อผิดพลาด: " . $e->getMessage() . "');</script>";
 }
+
+}
+
 
 ?>
 
@@ -206,6 +214,20 @@ $group = isset($_POST['group']) && !empty($_POST['group']) ? $_POST['group'] : $
         <option value="กลุ่มวิชาสำหรับผู้จบ ปวช.ต่างประเภทวิชา">กลุ่มวิชาสำหรับผู้จบ ปวช.ต่างประเภทวิชา</option>
     </select>
 </div>
+<div class="form-group">
+    <label for="teacher_id">ครูผู้สอน:</label>
+    <select id="teacher_id" name="teacher_id" required>
+        <option value="">เลือกครู</option>
+        <?php
+        $stmt = $conn->prepare("SELECT teacher_id, teacher_name FROM teacherinfo");
+        $stmt->execute();
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            echo "<option value='{$row['teacher_id']}'" . ($row['teacher_id'] == $row['teacher_id'] ? ' selected' : '') . ">{$row['teacher_name']}</option>";
+        }
+        ?>
+    </select>
+</div>
+
 
 
             <!-- ปุ่มบันทึก/ยกเลิก -->
