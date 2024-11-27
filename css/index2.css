@@ -104,3 +104,38 @@ select{
 .add:hover{
     background-color: rgb(154, 229, 42);
 }
+
+.esom {
+    position: fixed;
+    right: 20px;
+    width: 50px;
+    height: 50px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 50%; /* ทำให้ปุ่มกลม */
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    font-size: 20px;
+    text-align: center;
+    line-height: 50px; /* จัดข้อความให้อยู่กลาง */
+    transition: background-color 0.3s, transform 0.2s;
+  }
+  
+  #scrollToTop {
+    bottom: 80px;
+  }
+  
+  #scrollToBottom {
+    bottom: 20px;
+  }
+  
+  .esom:hover {
+    background-color: #0056b3;
+    transform: scale(1.1);
+  }
+  
+  .esom:active {
+    transform: scale(0.95);
+  }
+  
