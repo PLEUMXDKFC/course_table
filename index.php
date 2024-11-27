@@ -28,6 +28,26 @@
 </head>
 
 <body>
+
+<button class="esom" id="scrollToTop">⬆</button>
+<button class="esom" id="scrollToBottom">⬇</button>
+
+  <script>
+    document.getElementById('scrollToTop').addEventListener('click', () => {
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth'
+  });
+});
+
+document.getElementById('scrollToBottom').addEventListener('click', () => {
+  window.scrollTo({
+    top: document.body.scrollHeight,
+    behavior: 'smooth'
+  });
+});
+</script>
+
     <div class="wrapper">
         <aside id="sidebar">
             <div class="d-flex">
