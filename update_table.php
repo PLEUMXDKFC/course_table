@@ -13,13 +13,19 @@ if (empty($subjectIds)) {
 
 // ดึงข้อมูลจากฐานข้อมูลตาม ID หลายรายการ
 $placeholders = rtrim(str_repeat('?,', count($subjectIds)), ',');
-$query = "SELECT subject_code, subject_name, theory, practice, credits, term, category, plan_group
+$query = "SELECT subject_code, subject_name, theory, practice, credits, term, category, plan_group, year
           FROM tb_plan WHERE subject_code IN ($placeholders)";
 $stmt = $conn->prepare($query);
 $stmt->execute($subjectIds);
 $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 if ($results) {
+    // ระบุ "ชั้นปี" ของ checkbox อันแรก
+    $firstYear = $results[0]['year'];
+
+    // กรองข้อมูลเฉพาะชั้นปีที่ตรงกับ $firstYear
+    $filteredResults = array_filter($results, fn($row) => $row['year'] == $firstYear);
+
     // แยกผลลัพธ์ตามภาคเรียน
     $semester1 = [];
     $semester2 = [];
@@ -30,13 +36,13 @@ if ($results) {
     $totalTheory2 = 0;
     $totalPractice2 = 0;
 
-    foreach ($results as $row) {
-        if ($row['term'] == 1) {
+    foreach ($filteredResults as $row) {
+        if (in_array($row['term'], [1, 3, 5])) { // term 1: 1, 3, 5
             $semester1[] = $row;
             $totalCredits1 += $row['credits'];
             $totalTheory1 += $row['theory'];
             $totalPractice1 += $row['practice'];
-        } elseif ($row['term'] == 2) {
+        } elseif (in_array($row['term'], [2, 4, 6])) { // term 2: 2, 4, 6
             $semester2[] = $row;
             $totalCredits2 += $row['credits'];
             $totalTheory2 += $row['theory'];
@@ -44,7 +50,7 @@ if ($results) {
         }
     }
 
-    // จัดการแสดงผล
+    // ดำเนินการจัดการแสดงผลเหมือนเดิม
     $categories1 = array_unique(array_column($semester1, 'category'));
     $categories2 = array_unique(array_column($semester2, 'category'));
 
@@ -55,13 +61,11 @@ if ($results) {
 
     foreach ($allCategories as $category) {
         echo "<tr>";
-        // แสดงหมวด (category)
         echo "<td></td>";
         echo "<td style='text-align: left;'><strong>{$category}</strong></td>";
         echo "<td></td>";
         echo "<td></td>";
         echo "<td></td>";
-        // --------------------\\
         echo "<td></td>";
         echo "<td style='text-align: left;'><strong>{$category}</strong></td>";
         echo "<td></td>";
@@ -80,13 +84,11 @@ if ($results) {
 
         foreach ($planGroups as $planGroup) {
             echo "<tr>";
-            // แสดงกลุ่มแผน (plan_group)
             echo "<td></td>";
             echo "<td style='text-align: left;'>{$planGroup}</td>";
             echo "<td></td>";
             echo "<td></td>";
             echo "<td></td>";
-            // --------------------\\
             echo "<td></td>";
             echo "<td style='text-align: left;'>{$planGroup}</td>";
             echo "<td></td>";
