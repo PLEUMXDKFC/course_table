@@ -22,7 +22,7 @@
 
 
     <link rel="stylesheet" href="dash.css">
-    <link rel="stylesheet" href="css/index1.css">
+    <link rel="stylesheet" href="css/index2.css">
     <link rel="stylesheet" href="css/ตารางแผนการเรียน2.css">
     <link rel="stylesheet" href="checktest.css">
 </head>
